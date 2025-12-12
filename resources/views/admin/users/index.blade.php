@@ -88,17 +88,35 @@
                                             <label>Role</label>
                                         </div>
                                         <hr>
-                                        <div class="form-floating mb-3">
-                                            <input type="password" name="old_password" class="form-control bg-dark text-white" placeholder="Password Lama">
+                                        <div class="form-floating mb-3 position-relative">
+                                            <input type="password" name="old_password" id="oldPassword{{ $user->id }}" class="form-control bg-dark text-white" placeholder="Password Lama">
                                             <label>Password Lama</label>
+
+                                            <span class="position-absolute top-50 end-0 translate-middle-y me-3 text-white"
+                                                onclick="togglePassword('oldPassword{{ $user->id }}', this)"
+                                                style="cursor: pointer;">
+                                                <i class="fa fa-eye"></i>
+                                            </span>
                                         </div>
-                                        <div class="form-floating mb-3">
-                                            <input type="password" name="new_password" class="form-control bg-dark text-white" placeholder="Password Baru">
+                                        <div class="form-floating mb-3 position-relative">
+                                            <input type="password" name="new_password" id="newPassword{{ $user->id }}" class="form-control bg-dark text-white" placeholder="Password Baru">
                                             <label>Password Baru</label>
+
+                                            <span class="position-absolute top-50 end-0 translate-middle-y me-3 text-white"
+                                                onclick="togglePassword('newPassword{{ $user->id }}', this)"
+                                                style="cursor: pointer;">
+                                                <i class="fa fa-eye"></i>
+                                            </span>
                                         </div>
-                                        <div class="form-floating mb-3">
-                                            <input type="password" name="new_password_confirmation" class="form-control bg-dark text-white" placeholder="Konfirmasi Password Baru">
+                                        <div class="form-floating mb-3 position-relative">
+                                            <input type="password" name="new_password_confirmation" id="newPasswordConfirm{{ $user->id }}" class="form-control bg-dark text-white" placeholder="Konfirmasi Password Baru">
                                             <label>Konfirmasi Password Baru</label>
+
+                                            <span class="position-absolute top-50 end-0 translate-middle-y me-3 text-white"
+                                                onclick="togglePassword('newPasswordConfirm{{ $user->id }}', this)"
+                                                style="cursor: pointer;">
+                                                <i class="fa fa-eye"></i>
+                                            </span>
                                         </div>
                                     </div>
                                     <div class="modal-footer">

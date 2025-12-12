@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\SupplierProductRequestedNotification;
+use App\Models\User;
 
 class ProductController extends Controller
 {
@@ -37,7 +39,13 @@ class ProductController extends Controller
         // Produk dari supplier default pending
         $validated['status'] = 'pending';
 
-        Product::create($validated);
+        $product = Product::create($validated);
+
+        // Kirim notifikasi ke semua admin
+        $admins = User::role('admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new SupplierProductRequestedNotification(Auth::user(), $product));
+        }
 
         return back()->with('success','Produk berhasil ditambahkan, menunggu persetujuan admin');
     }

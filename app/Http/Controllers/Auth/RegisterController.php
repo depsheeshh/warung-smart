@@ -36,6 +36,12 @@ class RegisterController extends Controller
 
         $user->assignRole('customer'); // default role
 
+        $admins = User::role('admin')->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new NewUserRegisteredNotification($user));
+        }
+
+
         Auth::login($user);
         return redirect()->route('customer.dashboard');
     }

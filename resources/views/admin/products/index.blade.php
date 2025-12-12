@@ -30,12 +30,16 @@
                     <tr>
                         <td>{{ $products->firstItem() + $index }}</td>
                         <td>{{ $product->name }}</td>
-                        <td>{{ $product->description }}</td>
+                        <td class="text-wrap">{{ $product->description }}</td>
                         <td>Rp {{ number_format($product->price,0,',','.') }}</td>
-                        <td>{{ $product->stock }}</td>
                         <td>
-                            {{ $product->supplier ? $product->supplier->name : 'Admin' }}
+                            @if($product->stock > 0)
+                                <span class="badge bg-info text-dark">Stok: {{ $product->stock }}</span>
+                            @else
+                                <span class="badge bg-danger">Stok Habis</span>
+                            @endif
                         </td>
+                        <td>{{ $product->supplier ? $product->supplier->name : 'Admin' }}</td>
                         <td>
                             <span class="badge bg-{{ $product->status == 'active' ? 'success' : 'warning' }}">
                                 {{ ucfirst($product->status) }}
@@ -72,6 +76,10 @@
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </form>
+                            <!-- Forecast -->
+                            <a href="{{ route('admin.forecast.generate',$product->id) }}" class="btn btn-sm btn-info">
+                                <i class="fa fa-chart-line me-1"></i> Forecast
+                            </a>
                         </td>
                     </tr>
 
@@ -124,7 +132,7 @@
         </div>
 
         <div class="mt-3">
-            {{ $products->links() }}
+            {{ $products->links('pagination::bootstrap-5') }}
         </div>
     </div>
 </div>

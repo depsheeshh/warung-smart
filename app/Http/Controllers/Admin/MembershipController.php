@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use App\Models\MembershipSubscription;
-use Carbon\Carbon;
+use App\Notifications\MembershipApprovedNotification;
 
 class MembershipController extends Controller
 {
@@ -23,7 +24,12 @@ class MembershipController extends Controller
             'ends_at'   => Carbon::today()->addMonth(), // contoh durasi 1 bulan
         ]);
 
+        // update membership type user
         $subscription->user->update(['membership_type' => 'premium']);
+
+        // kirim notifikasi ke user (customer)
+        $subscription->user->notify(new MembershipApprovedNotification());
+
 
         return back()->with('success','Membership diaktifkan.');
     }

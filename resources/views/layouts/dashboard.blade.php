@@ -72,6 +72,24 @@
     <script src="{{ asset('lib/tempusdominus/js/moment-timezone.min.js') }}"></script>
     <script src="{{ asset('lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js') }}"></script>
     <script src="{{ asset('js/main.js') }}"></script>
+
+    <script>
+function togglePassword(id, el) {
+    const input = document.getElementById(id);
+    const icon = el.querySelector('i');
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = "password";
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>
+
     @stack('scripts')
 </body>
 

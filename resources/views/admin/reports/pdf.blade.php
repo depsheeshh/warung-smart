@@ -3,46 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <title>Laporan Transaksi</title>
+
     <style>
-        body { font-family: sans-serif; font-size: 12px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #000; padding: 6px; text-align: left; }
-        th { background: #eee; }
-        h3, h4 { margin-bottom: 10px; }
+        body {
+            font-family: sans-serif;
+            font-size: 12px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        /* HEADER */
+        .header-table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .sub-title {
+            font-size: 13px;
+            margin-top: 3px;
+            color: #555;
+        }
+
+        .divider {
+            width: 100%;
+            height: 2px;
+            background: #2c3e50;
+            margin: 12px 0 20px;
+        }
+
+        /* TABLE STYLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            font-size: 11.5px;
+        }
+
+        th {
+            background: #e7f1ff;
+            color: #1f3d7a;
+            padding: 7px;
+            border: 1px solid #cdd8e6;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 7px;
+            border: 1px solid #dcdcdc;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        /* SECTION TITLE */
+        h4 {
+            margin-top: 25px;
+            margin-bottom: 10px;
+            color: #1f3d7a;
+            font-size: 15px;
+        }
+
+        /* FOOTER SIGNATURE */
+        .footer-sign {
+            margin-top: 50px;
+            text-align: right;
+            line-height: 1.6;
+        }
+
+        .signature {
+            margin-top: 45px;
+            font-weight: bold;
+            font-size: 13px;
+            text-decoration: underline;
+        }
+
+        /* SMALL TEXT */
+        .muted {
+            color: #666;
+        }
     </style>
+
 </head>
 <body>
-    {{-- Header dengan logo UPI --}}
-    <table style="width:100%; margin-bottom:20px; border:none;">
+
+    {{-- HEADER --}}
+    <table class="header-table">
         <tr>
-            <td style="width:80px; border:none;">
-                <img src="{{ public_path('images/logo-upi.png') }}" alt="Logo UPI" style="width:70px;">
+            <td style="width:80px;">
+                <img src="{{ public_path('img/logo.png') }}" alt="Logo" style="width:70px;">
             </td>
-            <td style="border:none; text-align:center;">
-                <h3 style="margin:0;">Laporan & Rekap Transaksi</h3>
-                <p style="margin:0;">Universitas Pendidikan Indonesia</p>
+            <td style="text-align:center;">
+                <p class="header-title">LAPORAN & REKAP TRANSAKSI</p>
+                <p class="sub-title">WarungSmart</p>
             </td>
         </tr>
     </table>
 
-    <p><strong>Periode:</strong> {{ ucfirst($periode) }} ({{ $date }})</p>
+    <div class="divider"></div>
 
-    {{-- Ringkasan Pesanan --}}
+    {{-- FILTER INFO --}}
+    <p>
+        <strong>Filter:</strong>
+        @if($mode === 'periode' && $periode)
+            Periode {{ ucfirst($periode) }} ({{ $date }})
+        @elseif($mode === 'date' && $date)
+            Tanggal {{ $date }}
+        @else
+            <span class="muted">Tidak ada filter diterapkan</span>
+        @endif
+    </p>
+
+    {{-- SUMMARY SECTION --}}
+    <h4>Ringkasan Pesanan</h4>
     <p><strong>Total Pesanan:</strong> {{ $totalOrders }}</p>
-    <p>Pending: {{ $pendingOrders }} | Diterima: {{ $acceptedOrders }} | Ditolak: {{ $rejectedOrders }}</p>
+    <p>
+        Pending: {{ $pendingOrders }} |
+        Diterima: {{ $acceptedOrders }} |
+        Ditolak: {{ $rejectedOrders }}
+    </p>
 
-    {{-- Ringkasan Produk --}}
+    <h4>Ringkasan Produk</h4>
     <p><strong>Total Produk:</strong> {{ $totalProducts }}</p>
-    <p>Aktif: {{ $activeProducts }} | Pending: {{ $pendingProducts }}</p>
+    <p>
+        Produk Aktif: {{ $activeProducts }} |
+        Produk Pending: {{ $pendingProducts }}
+    </p>
 
-    {{-- Ringkasan Diskon Membership --}}
-    <p><strong>Total Diskon Diberikan:</strong> Rp {{ number_format($ordersPerSupplier->sum('discount'),0,',','.') }}</p>
-
-    {{-- Revenue --}}
+    <h4>Diskon & Revenue</h4>
+    <p><strong>Total Diskon:</strong> Rp {{ number_format($ordersPerSupplier->sum('discount'),0,',','.') }}</p>
     <p><strong>Total Revenue (Simulatif):</strong> Rp {{ number_format($totalRevenue,0,',','.') }}</p>
 
-    {{-- Pesanan per Supplier/Admin --}}
+    {{-- PESANAN PER SUPPLIER --}}
     <h4>Pesanan per Supplier/Admin</h4>
+
     <table>
         <thead>
             <tr>
@@ -69,13 +171,16 @@
                 <td>Rp {{ number_format($data['discount'],0,',','.') }}</td>
             </tr>
             @empty
-            <tr><td colspan="8" style="text-align:center; color:#666;">Belum ada data pesanan.</td></tr>
+            <tr>
+                <td colspan="8" style="text-align:center;" class="muted">Belum ada data pesanan.</td>
+            </tr>
             @endforelse
         </tbody>
     </table>
 
-    {{-- Produk per Supplier/Admin --}}
+    {{-- PRODUK PER SUPPLIER --}}
     <h4>Produk per Supplier/Admin</h4>
+
     <table>
         <thead>
             <tr>
@@ -94,51 +199,57 @@
                 <td>{{ $data['total'] }}</td>
             </tr>
             @empty
-            <tr><td colspan="4" style="text-align:center; color:#666;">Belum ada data produk.</td></tr>
+            <tr>
+                <td colspan="4" style="text-align:center;" class="muted">Belum ada data produk.</td>
+            </tr>
             @endforelse
         </tbody>
     </table>
 
-    {{-- Detail Orders --}}
+    {{-- DETAIL PESANAN --}}
     <h4>Detail Pesanan</h4>
+
     <table>
-    <thead>
+        <thead>
         <tr>
-        <th>Customer</th>
-        <th>Produk</th>
-        <th>Jumlah</th>
-        <th>Harga Asli</th>
-        <th>Harga Final</th>
-        <th>Diskon</th>
-        <th>Status</th>
-        <th>Tanggal</th>
+            <th>Customer</th>
+            <th>Produk</th>
+            <th>Jumlah</th>
+            <th>Harga Asli</th>
+            <th>Harga Final</th>
+            <th>Diskon</th>
+            <th>Status</th>
+            <th>Tanggal</th>
         </tr>
-    </thead>
-    <tbody>
+        </thead>
+        <tbody>
         @foreach($orders as $order)
         <tr>
-        <td>{{ $order->customer->name ?? '—' }}</td>
-        <td>{{ $order->product->name ?? $order->product->nama_barang ?? '—' }}</td>
-        <td>{{ $order->quantity }}</td>
-        <td>Rp {{ number_format($order->product->price,0,',','.') }}</td>
-        <td>Rp {{ number_format($order->price_snapshot ?? $order->product->price,0,',','.') }}</td>
-        <td>Rp {{ number_format(max(0, ($order->product->price - ($order->price_snapshot ?? $order->product->price))) * $order->quantity,0,',','.') }}</td>
-        <td>{{ ucfirst($order->status) }}</td>
-        <td>{{ $order->created_at->format('d M Y H:i') }}</td>
+            <td>{{ $order->customer->name ?? '—' }}</td>
+            <td>{{ $order->product->name ?? $order->product->nama_barang ?? '—' }}</td>
+            <td>{{ $order->quantity }}</td>
+            <td>Rp {{ number_format($order->product->price,0,',','.') }}</td>
+            <td>Rp {{ number_format($order->unit_price,0,',','.') }}</td>
+            <td>
+                Rp {{ number_format(max(0, ($order->product->price - $order->unit_price)) * $order->quantity,0,',','.') }}
+            </td>
+            <td>{{ ucfirst($order->status) }}</td>
+            <td>{{ $order->created_at->format('d M Y H:i') }}</td>
         </tr>
         @endforeach
-    </tbody>
+        </tbody>
     </table>
 
-
-    {{-- Tren Bulanan --}}
+    {{-- TREND BULANAN --}}
     <h4>Tren Pesanan Bulanan</h4>
+
     <table>
         <thead>
             <tr>
                 <th>Bulan</th>
                 <th>Total Pesanan</th>
-                <th>Jumlah Barang Dipesan</th>
+                <th>Jumlah Barang</th>
+                <th>Total Revenue</th>
             </tr>
         </thead>
         <tbody>
@@ -147,17 +258,67 @@
                 <td>{{ \Carbon\Carbon::create($row->year, $row->month)->translatedFormat('F Y') }}</td>
                 <td>{{ $row->total }}</td>
                 <td>{{ $row->qty_total }}</td>
+                <td>Rp {{ number_format($row->revenue,0,',','.') }}</td>
             </tr>
             @empty
-            <tr><td colspan="3" style="text-align:center; color:#666;">Belum ada data bulanan.</td></tr>
+            <tr>
+                <td colspan="4" style="text-align:center;" class="muted">Tidak ada data tren bulanan.</td>
+            </tr>
             @endforelse
         </tbody>
     </table>
 
-    {{-- Footer --}}
-    <p style="text-align:right; margin-top:40px;">
+    <h4>Detail Pengeluaran</h4>
+    <table>
+    <thead>
+        <tr>
+        <th>Kategori</th>
+        <th>Tanggal</th>
+        <th>Nominal</th>
+        <th>Catatan</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse(\App\Models\Expense::orderByDesc('date')->take(10)->get() as $expense)
+        <tr>
+            <td>{{ $expense->category }}</td>
+            <td>{{ $expense->date->format('d M Y') }}</td>
+            <td>Rp {{ number_format($expense->amount,0,',','.') }}</td>
+            <td>{{ $expense->notes ?? '—' }}</td>
+        </tr>
+        @empty
+        <tr>
+            <td colspan="4" style="text-align:center;" class="muted">Belum ada data pengeluaran.</td>
+        </tr>
+        @endforelse
+    </tbody>
+    </table>
+
+
+    <h4>Ringkasan Keuangan</h4>
+    <p><strong>Pendapatan:</strong> Rp {{ number_format($totalRevenue,0,',','.') }}</p>
+    <p><strong>Biaya:</strong> Rp {{ number_format($expenses,0,',','.') }}</p>
+    <p><strong>Kasbon Aktif:</strong> Rp {{ number_format($debts,0,',','.') }}</p>
+    <p><strong>Laba/Rugi:</strong> Rp {{ number_format($profitLoss,0,',','.') }}</p>
+
+    <h4>Ringkasan Keuangan</h4>
+    <p><strong>Pendapatan:</strong> Rp {{ number_format($totalRevenue,0,',','.') }}</p>
+    <p><strong>Biaya:</strong> Rp {{ number_format($expenses,0,',','.') }}</p>
+    <p><strong>Kasbon Aktif:</strong> Rp {{ number_format($debts,0,',','.') }}</p>
+    <p><strong>Laba/Rugi:</strong> Rp {{ number_format($profitLoss,0,',','.') }}</p>
+
+    <h4>Ringkasan Operasional</h4>
+    <p><strong>Supplier Telat:</strong> {{ $delayedCount }}</p>
+    <p><strong>Produk dengan Harga Naik ≥10%:</strong> {{ $recentIncreasesCount }}</p>
+    <p><strong>Produk Stok Rendah (≤10):</strong> {{ $lowStocksCount }}</p>
+
+
+
+    {{-- FOOTER --}}
+    <div class="footer-sign">
         Dicetak pada {{ now()->format('d M Y H:i') }}<br>
-        <strong>Usman</strong>
-    </p>
+        <span class="signature">{{ auth()->user()->name }}</span>
+    </div>
+
 </body>
 </html>

@@ -19,7 +19,6 @@
           <th>Total Harga</th>
           <th>Status</th>
           <th>Tanggal</th>
-          <!-- HAPUS kolom Aksi -->
         </tr>
       </thead>
       <tbody>
@@ -29,17 +28,26 @@
           <td>{{ $order->product->name }}</td>
           <td>{{ $order->customer->name }}</td>
           <td>{{ $order->quantity }}</td>
+
+          {{-- Harga satuan: selalu harga asli produk --}}
           <td>Rp {{ number_format($order->product->price) }}</td>
-          <td>Rp {{ number_format($order->quantity * $order->product->price) }}</td>
+
+          {{-- Total harga: harga asli × jumlah --}}
+          <td>Rp {{ number_format($order->product->price * $order->quantity) }}</td>
+
+          {{-- Status --}}
           <td>
             <span class="badge bg-{{ $order->status == 'accepted' ? 'success' : ($order->status == 'rejected' ? 'danger' : 'warning') }}">
               {{ ucfirst($order->status) }}
             </span>
           </td>
+
           <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
         </tr>
         @empty
-        <tr><td colspan="8" class="text-center text-muted">Belum ada pesanan.</td></tr>
+        <tr>
+          <td colspan="8" class="text-center text-muted">Belum ada pesanan.</td>
+        </tr>
         @endforelse
       </tbody>
     </table>

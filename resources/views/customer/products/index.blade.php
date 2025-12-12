@@ -48,15 +48,27 @@
                 Rp {{ number_format($price['final'],0,',','.') }}
               @endif
             </td>
-            <td>{{ $product->stock }}</td>
             <td>
-              <form action="{{ route('customer.orders.store',$product->id) }}" method="POST" class="d-inline">
-                @csrf
-                <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}" class="form-control form-control-sm d-inline w-25">
-                <button class="btn btn-sm btn-primary">
-                  <i class="fa fa-shopping-cart me-1"></i>Pesan
+              @if($product->stock > 0)
+                <span class="badge bg-info text-dark">Stok: {{ $product->stock }}</span>
+              @else
+                <span class="badge bg-danger">Stok Habis</span>
+              @endif
+            </td>
+            <td>
+              @if($product->stock > 0)
+                <form action="{{ route('customer.orders.store',$product->id) }}" method="POST" class="d-inline">
+                  @csrf
+                  <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}" class="form-control form-control-sm d-inline w-25">
+                  <button class="btn btn-sm btn-primary">
+                    <i class="fa fa-shopping-cart me-1"></i>Pesan
+                  </button>
+                </form>
+              @else
+                <button class="btn btn-sm btn-secondary" disabled>
+                  <i class="fa fa-ban me-1"></i>Tidak Bisa Pesan
                 </button>
-              </form>
+              @endif
             </td>
           </tr>
           @empty

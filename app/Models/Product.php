@@ -10,9 +10,19 @@ class Product extends Model
 
     protected $fillable = ['name','description','price','stock','status','image','supplier_id'];
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'product_id');
+    }
+
     public function supplier()
     {
         return $this->belongsTo(User::class, 'supplier_id');
+    }
+
+    public function prices()
+    {
+        return $this->hasMany(SupplierPrice::class);
     }
 
     public function getPriceForUser($user)
@@ -34,6 +44,18 @@ class Product extends Model
             'final' => $finalPrice,
             'percent' => $percent,
         ];
+    }
+
+    // relasi ke ForecastResult
+    public function forecastResults()
+    {
+        return $this->hasMany(ForecastResult::class, 'product_id');
+    }
+
+    // relasi ke ForecastMetric
+    public function forecastMetric()
+    {
+        return $this->hasOne(ForecastMetric::class, 'product_id');
     }
 
 }

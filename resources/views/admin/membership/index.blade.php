@@ -6,10 +6,6 @@
   <div class="bg-secondary rounded h-100 p-4">
     <h6 class="mb-3">Pengajuan Membership</h6>
 
-    @if(session('success'))
-      <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
     {{-- Pending list --}}
     <h6 class="mb-2">Pending</h6>
     <table class="table table-bordered text-white align-middle">

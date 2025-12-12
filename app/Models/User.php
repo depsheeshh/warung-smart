@@ -23,7 +23,8 @@ class User extends Authenticatable
         'email',
         'password',
         'phone','address',
-        'membership_type'
+        'membership_type',
+        'avatar',
     ];
 
     /**
@@ -76,4 +77,21 @@ class User extends Authenticatable
 
         return true;
     }
+
+    public function debts()
+    {
+        return $this->hasMany(Debt::class,'customer_id');
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(SupplierSchedule::class, 'supplier_id');
+    }
+
+    public function prices()
+    {
+        return $this->hasMany(SupplierPrice::class, 'supplier_id');
+    }
+
+
 }

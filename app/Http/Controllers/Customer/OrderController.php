@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\Customer;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\MembershipDiscount;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\MembershipDiscount;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Notifications\OrderCreatedNotification;
+use App\Notifications\SupplierOrderNotification;
 
 class OrderController extends Controller
 {
@@ -28,33 +31,59 @@ class OrderController extends Controller
             'quantity' => 'required|integer|min:1|max:' . max(1, (int)$product->stock),
         ]);
 
-        $user = Auth::user();
+        $user     = Auth::user();
+        $quantity = $validated['quantity'];
 
-        // Harga dasar & final
-        $basePrice  = $product->price;
-        $finalPrice = $basePrice;
+        $basePrice       = $product->price;
+        $discountPercent = 0;
 
         if ($user && method_exists($user, 'isPremium') && $user->isPremium()) {
-            $discount = MembershipDiscount::active()->orderByDesc('discount_percent')->first();
-            if ($discount) {
-                $finalPrice = $basePrice * (1 - ($discount->discount_percent / 100));
+            $activeDiscount = MembershipDiscount::active()
+                ->orderByDesc('discount_percent')
+                ->first();
+
+            if ($activeDiscount) {
+                $discountPercent = $activeDiscount->discount_percent;
             }
         }
 
-        DB::transaction(function() use ($user, $product, $validated, $finalPrice) {
-            // Buat order dengan snapshot harga final
-            Order::create([
-                'customer_id'   => $user->id,
-                'product_id'    => $product->id,
-                'quantity'      => $validated['quantity'],
-                'status'        => 'pending',
-                'price_snapshot'=> $finalPrice,
+        $unitPrice  = $basePrice * (1 - $discountPercent / 100);
+        $totalPrice = $unitPrice * $quantity;
+
+        // simpan order ke variabel
+        $order = null;
+        DB::transaction(function() use ($user, $product, $quantity, $unitPrice, $totalPrice, $discountPercent, &$order) {
+            $order = Order::create([
+                'customer_id'     => $user->id,
+                'product_id'      => $product->id,
+                'quantity'        => $quantity,
+                'status'          => 'pending',
+                'unit_price'      => $unitPrice,
+                'total_price'     => $totalPrice,
+                'discount_percent'=> $discountPercent,
             ]);
 
-            // Opsional: kurangi stok saat pesanan dibuat (atau saat accepted, tergantung kebijakan)
-            // $product->decrement('stock', $validated['quantity']);
+            $product->decrement('stock', $quantity);
         });
 
-        return back()->with('success', 'Pesanan berhasil dibuat dengan harga Rp ' . number_format($finalPrice, 0, ',', '.'));
+        $message = 'Pesanan berhasil dibuat dengan harga Rp ' . number_format($unitPrice, 0, ',', '.');
+        if ($discountPercent > 0) {
+            $message .= ' (Diskon membership ' . $discountPercent . '% aktif)';
+        }
+
+        // Notifikasi admin
+        $admins = User::role('admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new OrderCreatedNotification($user, $product));
+        }
+
+        // Notifikasi supplier
+        $supplier = $product->supplier; // pastikan relasi product->supplier ada
+        if ($supplier && $order) {
+            $supplier->notify(new SupplierOrderNotification($order));
+        }
+
+        return back()->with('success', $message);
     }
+
 }

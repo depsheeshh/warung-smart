@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('membership_discounts', function (Blueprint $table) {
             $table->id();
             $table->decimal('discount_percent', 5, 2); // contoh: 20.00
+            $table->enum('status',['active','inactive'])->default('active');
             $table->date('starts_at');
             $table->date('ends_at');
             $table->timestamps();

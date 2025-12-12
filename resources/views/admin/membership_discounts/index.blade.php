@@ -80,7 +80,7 @@
         @endforelse
       </tbody>
     </table>
-    {{ $discounts->links() }}
+    {{ $discounts->links('pagination::bootstrap-5') }}
   </div>
 </div>
 

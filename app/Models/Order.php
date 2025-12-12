@@ -11,13 +11,16 @@ class Order extends Model
         'product_id',
         'quantity',
         'status',
-        'price_snapshot',
+        'unit_price',
+        'total_price',
     ];
 
     protected $casts = [
-        'price_snapshot' => 'float',
-        'quantity'       => 'integer',
+        'unit_price'  => 'float',
+        'total_price' => 'float',
+        'quantity'    => 'integer',
     ];
+
 
     public function customer()
     {
@@ -32,5 +35,28 @@ class Order extends Model
     public function supplier()
     {
         return $this->product ? $this->product->supplier : null;
+    }
+
+    public function getUnitPriceAttribute($value)
+    {
+        return $value ?? $this->product->price;
+    }
+
+    public function getTotalPriceAttribute($value)
+    {
+        return $value ?? $this->quantity * $this->unit_price;
+    }
+
+
+    protected static function booted()
+    {
+        static::updating(function ($order) {
+            // Jika status awal sudah final, jangan izinkan perubahan status
+            if (in_array($order->getOriginal('status'), ['accepted','rejected'])
+                && $order->isDirty('status')) {
+                // Batalkan perubahan status
+                throw new \RuntimeException('Status pesanan sudah final.');
+            }
+        });
     }
 }

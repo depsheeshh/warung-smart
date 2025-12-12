@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Notifications\NewProductNotification;
+use App\Notifications\SupplierProductApprovedNotification;
 
 class ProductController extends Controller
 {
@@ -31,7 +33,12 @@ class ProductController extends Controller
         // Produk dari admin langsung aktif
         $validated['status'] = 'active';
 
-        Product::create($validated);
+        $product = Product::create($validated);
+
+        $customers = \App\Models\User::role('customer')->get();
+            foreach ($customers as $customer) {
+                $customer->notify(new NewProductNotification($product));
+            }
 
         return back()->with('success','Produk berhasil ditambahkan dan langsung aktif');
     }
@@ -64,6 +71,10 @@ class ProductController extends Controller
     public function approve(Product $product)
     {
         $product->update(['status' => 'active']);
+            if ($product->supplier) {
+                $product->supplier->notify(new SupplierProductApprovedNotification($product));
+            }
+
         return back()->with('success','Produk berhasil disetujui');
     }
 }

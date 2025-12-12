@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Expense; // tambahan untuk biaya operasional
+use App\Models\Debt;    // tambahan untuk kasbon
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
@@ -11,20 +13,27 @@ use App\Http\Controllers\Controller;
 
 class ReportController extends Controller
 {
-    private function getReportData(string $periode = 'monthly', ?string $date = null): array
+    private function getReportData(?string $mode = null, ?string $periode = null, ?string $date = null): array
     {
-        $date = $date ?? now()->toDateString();
-        $d = \Carbon\Carbon::parse($date);
+        $query = Order::with(['product','product.supplier','customer']);
 
-        $query = Order::query();
+        if (!$mode) {
+            $query->whereRaw('1=0');
+        }
 
-        // Filter periode
-        if ($periode === 'daily') {
-            $query->whereDate('created_at', $d->toDateString());
-        } elseif ($periode === 'monthly') {
-            $query->whereYear('created_at', $d->year)->whereMonth('created_at', $d->month);
-        } elseif ($periode === 'yearly') {
-            $query->whereYear('created_at', $d->year);
+        if ($mode === 'periode' && $periode) {
+            $d = \Carbon\Carbon::parse($date ?? now());
+            if ($periode === 'daily') {
+                $query->whereDate('created_at', $d->toDateString());
+            } elseif ($periode === 'monthly') {
+                $query->whereYear('created_at', $d->year)->whereMonth('created_at', $d->month);
+            } elseif ($periode === 'yearly') {
+                $query->whereYear('created_at', $d->year);
+            }
+        }
+
+        if ($mode === 'date' && $date) {
+            $query->whereDate('created_at', \Carbon\Carbon::parse($date)->toDateString());
         }
 
         // Ringkasan pesanan
@@ -34,71 +43,52 @@ class ReportController extends Controller
         $rejectedOrders = (clone $query)->where('status','rejected')->count();
 
         // Ringkasan produk
-        $totalProducts   = Product::count();
-        $activeProducts  = Product::where('status','active')->count();
-        $pendingProducts = Product::where('status','pending')->count();
+        $totalProducts  = Product::count();
+        $activeProducts = Product::where('status','active')->count();
+        $pendingProducts= Product::where('status','pending')->count();
 
-        // Ambil accepted untuk kalkulasi revenue & discount
-        $accepted = (clone $query)->where('status','accepted')->with('product')->get();
-
-        // Total revenue: quantity × price_final (snapshot)
-        $totalRevenue = $accepted->sum(function($o) {
-            $base  = $o->product->price ?? 0;
-            $final = $o->price_snapshot ?? $base;
-            return $o->quantity * $final;
-        });
-
-        // Total discount: selisih harga × quantity
-        $totalDiscount = $accepted->sum(function($o) {
-            $base  = $o->product->price ?? 0;
-            $final = $o->price_snapshot ?? $base;
-            $diff  = max(0, $base - $final);
+        // Accepted orders untuk revenue & discount
+        $accepted = (clone $query)->where('status','accepted')->get();
+        $totalRevenue = $accepted->sum('total_price');
+        $totalDiscount= $accepted->sum(function($o) {
+            $base = $o->product->price ?? 0;
+            $diff = max(0, $base - $o->unit_price);
             return $o->quantity * $diff;
         });
 
         // Pesanan per supplier/admin
-        $ordersPerSupplier = (clone $query)->with('product.supplier')->get()
-            ->groupBy(function($o) {
-                return $o->product->supplier->name ?? $o->product->created_by?->name ?? 'Admin';
-            })
+        $ordersPerSupplier = (clone $query)->get()
+            ->groupBy(fn($o) => $o->product->supplier->name ?? $o->product->created_by?->name ?? 'Admin')
             ->map(function($group) {
                 $accepted = $group->where('status','accepted');
-
-                $revenue = $accepted->sum(function($o){
-                    $base  = $o->product->price ?? 0;
-                    $final = $o->price_snapshot ?? $base;
-                    return $o->quantity * $final;
-                });
-
-                $discount = $accepted->sum(function($o){
-                    $base  = $o->product->price ?? 0;
-                    $final = $o->price_snapshot ?? $base;
-                    $diff  = max(0, $base - $final);
-                    return $o->quantity * $diff;
-                });
-
                 return [
-                    'orders'    => $group->count(),
-                    'accepted'  => $accepted->count(),
-                    'rejected'  => $group->where('status','rejected')->count(),
-                    'qty_total' => $group->sum('quantity'),
-                    'qty_sold'  => $accepted->sum('quantity'),
-                    'revenue'   => $revenue,
-                    'discount'  => $discount,
+                    'orders'   => $group->count(),
+                    'accepted' => $accepted->count(),
+                    'rejected' => $group->where('status','rejected')->count(),
+                    'qty_total'=> $group->sum('quantity'),
+                    'qty_sold' => $accepted->sum('quantity'),
+                    'revenue'  => $accepted->sum('total_price'),
+                    'discount' => $accepted->sum(function($o){
+                        $base = $o->product->price ?? 0;
+                        $diff = max(0, $base - $o->unit_price);
+                        return $o->quantity * $diff;
+                    }),
                 ];
             });
 
         // Tren bulanan
         $monthlyOrders = Order::select(
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('COUNT(*) as total'),
-                DB::raw('SUM(quantity) as qty_total')
-            )
-            ->groupBy('year','month')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get();
+            DB::raw('YEAR(created_at) as year'),
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('COUNT(*) as total'),
+            DB::raw('SUM(quantity) as qty_total'),
+            DB::raw('SUM(total_price) as revenue')
+        )
+        ->where('status','accepted')
+        ->groupBy('year','month')
+        ->orderBy('year')
+        ->orderBy('month')
+        ->get();
 
         // Produk per supplier/admin
         $productsPerSupplier = Product::with('supplier')->get()
@@ -109,32 +99,59 @@ class ReportController extends Controller
                 'total'   => $group->count(),
             ]);
 
-        // Detail orders: kirim sebagai Eloquent (no map to array)
-        $orders = (clone $query)->with(['customer','product'])->get();
+        // Detail orders
+        $orders = (clone $query)->get();
+
+        // --- Tambahan: Keuangan ---
+        $expenses = Expense::sum('amount'); // total biaya
+        $debts    = Debt::whereIn('status',['unpaid','overdue'])->sum('amount'); // kasbon aktif
+        $profitLoss = $totalRevenue - $expenses; // laba/rugi sederhana
+
+        // --- Tambahan: Operasional ---
+        $delayedCount = \App\Models\SupplierSchedule::where('status','delayed')->count();
+
+        $recentIncreasesCount = \App\Models\SupplierPrice::select('supplier_id','product_id')
+            ->groupBy('supplier_id','product_id')
+            ->get()
+            ->filter(function($row){
+                $latest = \App\Models\SupplierPrice::latestFor($row->supplier_id,$row->product_id);
+                $previous = \App\Models\SupplierPrice::where('supplier_id',$row->supplier_id)
+                    ->where('product_id',$row->product_id)
+                    ->where('id','<',$latest->id)
+                    ->orderByDesc('date')->first();
+                return $latest && $previous && $latest->price > $previous->price
+                    && (($latest->price - $previous->price)/max($previous->price,1))*100 >= 10;
+            })->count();
+
+        $lowStocksCount = Product::where('stock','<=',10)->count();
+
 
         return compact(
-            'periode','date',
+            'mode','periode','date',
             'totalOrders','pendingOrders','acceptedOrders','rejectedOrders',
             'totalProducts','activeProducts','pendingProducts',
             'totalRevenue','totalDiscount','ordersPerSupplier','monthlyOrders','productsPerSupplier',
-            'orders'
+            'orders','expenses','debts','profitLoss',
+            'delayedCount','recentIncreasesCount','lowStocksCount'
         );
     }
 
     public function index(Request $request)
     {
-        $periode = $request->get('periode','monthly');
-        $date    = $request->get('date', now()->toDateString());
+        $mode    = $request->get('mode');
+        $periode = $request->get('periode');
+        $date    = $request->get('date');
 
-        return view('admin.reports.index', $this->getReportData($periode,$date));
+        return view('admin.reports.index', $this->getReportData($mode,$periode,$date));
     }
 
     public function exportPdf(Request $request)
     {
-        $periode = $request->get('periode','monthly');
-        $date    = $request->get('date', now()->toDateString());
+        $mode    = $request->get('mode');
+        $periode = $request->get('periode');
+        $date    = $request->get('date');
 
-        $pdf = Pdf::loadView('admin.reports.pdf', $this->getReportData($periode,$date));
+        $pdf = Pdf::loadView('admin.reports.pdf', $this->getReportData($mode,$periode,$date));
         return $pdf->download('laporan-transaksi.pdf');
     }
 }

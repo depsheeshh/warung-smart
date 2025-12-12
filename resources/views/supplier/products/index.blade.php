@@ -3,7 +3,6 @@
 
 @section('content')
 <div class="container-fluid pt-4 px-4">
-
     <div class="bg-secondary rounded h-100 p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h6 class="mb-0">Produk Saya</h6>
@@ -39,7 +38,13 @@
                         <td>{{ $product->name }}</td>
                         <td class="text-wrap">{{ $product->description }}</td>
                         <td>Rp {{ number_format($product->price, 0, ',', '.') }}</td>
-                        <td>{{ $product->stock }}</td>
+                        <td>
+                            @if($product->stock > 0)
+                                <span class="badge bg-info text-dark">Stok: {{ $product->stock }}</span>
+                            @else
+                                <span class="badge bg-danger">Stok Habis</span>
+                            @endif
+                        </td>
                         <td>
                             @if($product->status === 'active')
                                 <span class="badge bg-success"><i class="fa fa-check-circle me-1"></i>Aktif</span>
@@ -58,7 +63,7 @@
         </div>
 
         <div class="mt-3">
-            {{ $products->links() }}
+            {{ $products->links('pagination::bootstrap-5') }}
         </div>
     </div>
 </div>
@@ -92,7 +97,6 @@
                         <label>Stok</label>
                     </div>
 
-                    {{-- Style input file sesuai permintaan --}}
                     <div class="mb-3">
                         <label for="supplierFormFile" class="form-label">Gambar Produk</label>
                         <input class="form-control bg-dark text-white" type="file" id="supplierFormFile" name="image" accept=".jpg,.jpeg,.png">
