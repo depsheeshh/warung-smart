@@ -1,59 +1,249 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# WarungSmart
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 📖 Deskripsi
 
-## About Laravel
+**WarungSmart** adalah aplikasi berbasis web untuk digitalisasi warung tradisional. Sistem ini mendukung manajemen produk, pesanan, membership, kasbon, laporan, serta forecasting permintaan menggunakan metode **Single Exponential Smoothing (SES)** dengan evaluasi **MAD** dan **MAPE**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Aplikasi ini dirancang agar mudah digunakan oleh **Admin (Pa Usman)**, **Supplier**, dan **Customer** dengan antarmuka yang sederhana namun fungsional.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🚀 Fitur Utama
 
-## Learning Laravel
+### 👨‍💼 Admin (Pa Usman)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+* Kelola produk (tambah, edit, hapus, set stok, aktif/nonaktifkan produk)
+* Kelola membership (buat jenis membership, atur diskon, aktif/nonaktifkan)
+* Kelola kasbon pelanggan (catat hutang, update status pembayaran, lihat riwayat)
+* Lihat laporan transaksi (harian, mingguan, bulanan dengan filter)
+* Generate forecasting permintaan produk (SES + evaluasi MAD/MAPE)
+* Kelola supplier (approve produk baru, pantau aktivitas)
+* Manajemen pengguna (supplier & customer)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 📦 Supplier
 
-## Laravel Sponsors
+* Tambah produk baru (status *pending* hingga disetujui admin)
+* Lihat pesanan masuk dari customer
+* Update status pesanan (accepted/rejected dengan catatan)
+* Lihat histori harga produk
+* Pantau stok produk
+* Edit detail produk yang sudah di-*approve*
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 🛒 Customer
 
-### Premium Partners
+* Belanja produk dengan harga normal atau diskon membership
+* Lihat pesanan saya (status, total harga, riwayat transaksi)
+* Gunakan membership untuk diskon otomatis
+* Catat kasbon (pembelian hutang)
+* Lihat riwayat kasbon dan status pembayaran
+* Daftar atau perpanjang membership
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 🛠️ Teknologi
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+* **Framework**: Laravel v12
+* **Database**: MySQL
+* **Frontend**: Blade, Bootstrap, Chart.js
+* **Tools**: GitHub, Composer, NPM
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 📂 Struktur Proyek
 
-## Security Vulnerabilities
+```
+/app
+/resources/views
+/routes
+/database/migrations
+/public
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 📊 Dokumentasi Sistem
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Entity Relationship Diagram (ERD)
+
+**Entities:**
+
+* User
+* Product
+* Order
+* Membership
+* ForecastResult
+* ForecastMetric
+
+**Relasi:**
+
+* User – Membership
+* Supplier – Product
+* Customer – Order
+* Product – Order
+* Product – ForecastResult
+* Product – ForecastMetric
+
+### Use Case
+
+**Admin:**
+
+* Kelola Produk
+* Kelola Membership
+* Kelola Kasbon
+* Forecast Permintaan
+* Laporan Transaksi
+* Kelola Supplier
+* Manajemen Pengguna
+
+**Supplier:**
+
+* Tambah Produk
+* Pesanan Masuk
+* Update Status Pesanan
+* Histori Harga
+* Pantau Stok
+* Edit Produk
+
+**Customer:**
+
+* Belanja Produk
+* Membership
+* Kasbon
+* Pesanan
+* Riwayat Kasbon
+* Daftar / Perpanjang Membership
+
+### Activity Diagram (Contoh Alur Pemesanan)
+
+1. Customer memilih produk
+2. Sistem menampilkan detail + diskon membership
+3. Customer melakukan checkout
+4. Sistem membuat order
+5. Supplier menerima notifikasi pesanan
+6. Supplier mengupdate status pesanan
+7. Admin melihat laporan transaksi
+
+### UML Class Diagram (Ringkas)
+
+**User**
+
+* Attributes: `id`, `name`, `email`, `role`, `membership_id`
+* Methods: `login()`, `register()`, `hasMembership()`
+
+**Product**
+
+* Attributes: `id`, `name`, `price`, `stock`, `supplier_id`
+* Methods: `updateStock()`, `approveProduct()`
+
+**Order**
+
+* Attributes: `id`, `product_id`, `customer_id`, `quantity`, `total_price`
+* Methods: `calculateTotal()`, `updateStatus()`
+
+**Membership**
+
+* Attributes: `id`, `type`, `discount_percentage`
+* Methods: `applyDiscount()`
+
+**ForecastResult**
+
+* Attributes: `id`, `product_id`, `period`, `forecast`, `actual`
+* Methods: `generateForecast()`
+
+**ForecastMetric**
+
+* Attributes: `id`, `product_id`, `mad`, `mape`
+* Methods: `calculateMAD()`, `calculateMAPE()`
+
+---
+
+## ⚙️ Instruksi Penggunaan
+
+### 👨‍💼 Admin
+
+1. Login ke dashboard admin
+2. Kelola produk (CRUD, stok, status aktif)
+3. Kelola membership dan diskon
+4. Kelola kasbon pelanggan
+5. Jalankan forecasting permintaan produk
+6. Analisis laporan transaksi
+7. Approve produk supplier
+8. Kelola akun pengguna
+
+### 📦 Supplier
+
+1. Login ke dashboard supplier
+2. Tambah produk baru (menunggu approval admin)
+3. Pantau pesanan masuk
+4. Update status pesanan
+5. Lihat histori harga produk
+6. Pantau stok
+7. Edit produk yang sudah disetujui
+
+### 🛒 Customer
+
+1. Login ke dashboard customer
+2. Lihat dan pilih produk
+3. Checkout produk (diskon otomatis jika membership aktif)
+4. Pembelian kasbon (jika ada)
+5. Lihat status dan riwayat pesanan
+6. Lihat riwayat kasbon
+7. Daftar atau perpanjang membership
+
+---
+
+## ⚙️ Instalasi
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/username/warungsmart.git
+cd warungsmart
+```
+
+### 2. Install Dependencies
+
+```bash
+composer install
+npm install
+```
+
+### 3. Setup Environment
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+### 4. Migrasi Database
+
+```bash
+php artisan migrate --seed
+```
+
+### 5. Jalankan Server
+
+```bash
+php artisan serve
+```
+
+---
+
+## 📈 Forecasting
+
+* **Metode**: Single Exponential Smoothing (SES)
+* **Evaluasi**: Mean Absolute Deviation (MAD) & Mean Absolute Percentage Error (MAPE)
+* **Catatan**: Hasil evaluasi disimpan di backend dan tidak ditampilkan di UI
+
+---
+
+## 👥 Tim Pengembang
+
+* **Rifky** — Lead Developer & Architect
+* Supporting Developers & UI/UX Designers
+
+---
+
+## 📜 Lisensi
+
+Proyek ini bersifat **open-source** dan dapat digunakan serta dikembangkan lebih lanjut sesuai kebutuhan.
