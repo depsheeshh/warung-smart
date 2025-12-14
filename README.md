@@ -239,7 +239,7 @@ php artisan serve
 
 ## 👥 Tim Pengembang
 
-* **Rifky** — Lead Developer & Architect
+* **Oesman** — Lead Developer & Architect
 * Supporting Developers & UI/UX Designers
 
 ---
