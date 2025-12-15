@@ -2,9 +2,13 @@
 
 ## 📖 Deskripsi
 
-**WarungSmart** adalah aplikasi berbasis web untuk digitalisasi warung tradisional. Sistem ini mendukung manajemen produk, pesanan, membership, kasbon, laporan, serta forecasting permintaan menggunakan metode **Single Exponential Smoothing (SES)** dengan evaluasi **MAD** dan **MAPE**.
+**WarungSmart** adalah aplikasi web untuk digitalisasi warung tradisional. Sistem ini mendukung manajemen produk, pesanan, membership, kasbon, laporan, serta forecasting permintaan menggunakan metode **Single Exponential Smoothing (SES)** dengan evaluasi **MAD** dan **MAPE**.
 
-Aplikasi ini dirancang agar mudah digunakan oleh **Admin (Pa Usman)**, **Supplier**, dan **Customer** dengan antarmuka yang sederhana namun fungsional.
+Aplikasi ini digunakan oleh tiga peran utama:
+
+* **Admin (Pa Usman)**
+* **Supplier**
+* **Customer**
 
 ---
 
@@ -12,8 +16,8 @@ Aplikasi ini dirancang agar mudah digunakan oleh **Admin (Pa Usman)**, **Supplie
 
 ### 👨‍💼 Admin (Pa Usman)
 
-* Kelola produk (tambah, edit, hapus, set stok, aktif/nonaktifkan produk)
-* Kelola membership (buat jenis membership, atur diskon, aktif/nonaktifkan)
+* Kelola produk (CRUD, stok, aktif/nonaktifkan produk)
+* Kelola membership (buat jenis membership, atur diskon, approve/downgrade)
 * Kelola kasbon pelanggan (catat hutang, update status pembayaran, lihat riwayat)
 * Lihat laporan transaksi (harian, mingguan, bulanan dengan filter)
 * Generate forecasting permintaan produk (SES + evaluasi MAD/MAPE)
@@ -24,7 +28,7 @@ Aplikasi ini dirancang agar mudah digunakan oleh **Admin (Pa Usman)**, **Supplie
 
 * Tambah produk baru (status *pending* hingga disetujui admin)
 * Lihat pesanan masuk dari customer
-* Update status pesanan (accepted/rejected dengan catatan)
+* Update status pesanan (accepted/rejected dengan alasan penolakan)
 * Lihat histori harga produk
 * Pantau stok produk
 * Edit detail produk yang sudah di-*approve*
@@ -32,7 +36,7 @@ Aplikasi ini dirancang agar mudah digunakan oleh **Admin (Pa Usman)**, **Supplie
 ### 🛒 Customer
 
 * Belanja produk dengan harga normal atau diskon membership
-* Lihat pesanan saya (status, total harga, riwayat transaksi)
+* Lihat pesanan saya (riwayat transaksi, status, alasan penolakan jika ada)
 * Gunakan membership untuk diskon otomatis
 * Catat kasbon (pembelian hutang)
 * Lihat riwayat kasbon dan status pembayaran
@@ -71,6 +75,7 @@ Aplikasi ini dirancang agar mudah digunakan oleh **Admin (Pa Usman)**, **Supplie
 * Product
 * Order
 * Membership
+* Debt
 * ForecastResult
 * ForecastMetric
 
@@ -82,6 +87,9 @@ Aplikasi ini dirancang agar mudah digunakan oleh **Admin (Pa Usman)**, **Supplie
 * Product – Order
 * Product – ForecastResult
 * Product – ForecastMetric
+* Customer – Debt
+
+---
 
 ### Use Case
 
@@ -93,7 +101,7 @@ Aplikasi ini dirancang agar mudah digunakan oleh **Admin (Pa Usman)**, **Supplie
 * Forecast Permintaan
 * Laporan Transaksi
 * Kelola Supplier
-* Manajemen Pengguna
+* Manajemen User
 
 **Supplier:**
 
@@ -113,47 +121,48 @@ Aplikasi ini dirancang agar mudah digunakan oleh **Admin (Pa Usman)**, **Supplie
 * Riwayat Kasbon
 * Daftar / Perpanjang Membership
 
-### Activity Diagram (Contoh Alur Pemesanan)
+---
+
+### Activity Diagram (Alur Pemesanan)
 
 1. Customer memilih produk
-2. Sistem menampilkan detail + diskon membership
-3. Customer melakukan checkout
-4. Sistem membuat order
-5. Supplier menerima notifikasi pesanan
-6. Supplier mengupdate status pesanan
-7. Admin melihat laporan transaksi
+2. Sistem menampilkan detail produk dan diskon membership
+3. Customer melakukan checkout → order tercatat
+4. Supplier menerima notifikasi pesanan
+5. Supplier mengupdate status pesanan (accepted/rejected dengan alasan)
+6. Admin melihat laporan transaksi
+
+---
 
 ### UML Class Diagram (Ringkas)
 
 **User**
 
 * Attributes: `id`, `name`, `email`, `role`, `membership_id`
-* Methods: `login()`, `register()`, `hasMembership()`
 
 **Product**
 
 * Attributes: `id`, `name`, `price`, `stock`, `supplier_id`
-* Methods: `updateStock()`, `approveProduct()`
 
 **Order**
 
-* Attributes: `id`, `product_id`, `customer_id`, `quantity`, `total_price`
-* Methods: `calculateTotal()`, `updateStatus()`
+* Attributes: `id`, `product_id`, `customer_id`, `quantity`, `total_price`, `status`, `rejection_reason`
 
 **Membership**
 
 * Attributes: `id`, `type`, `discount_percentage`
-* Methods: `applyDiscount()`
+
+**Debt**
+
+* Attributes: `id`, `customer_id`, `product_id`, `amount`, `status`, `due_date`, `notes`
 
 **ForecastResult**
 
 * Attributes: `id`, `product_id`, `period`, `forecast`, `actual`
-* Methods: `generateForecast()`
 
 **ForecastMetric**
 
 * Attributes: `id`, `product_id`, `mad`, `mape`
-* Methods: `calculateMAD()`, `calculateMAPE()`
 
 ---
 
@@ -175,7 +184,7 @@ Aplikasi ini dirancang agar mudah digunakan oleh **Admin (Pa Usman)**, **Supplie
 1. Login ke dashboard supplier
 2. Tambah produk baru (menunggu approval admin)
 3. Pantau pesanan masuk
-4. Update status pesanan
+4. Update status pesanan (accepted/rejected dengan alasan)
 5. Lihat histori harga produk
 6. Pantau stok
 7. Edit produk yang sudah disetujui
@@ -233,13 +242,14 @@ php artisan serve
 
 * **Metode**: Single Exponential Smoothing (SES)
 * **Evaluasi**: Mean Absolute Deviation (MAD) & Mean Absolute Percentage Error (MAPE)
-* **Catatan**: Hasil evaluasi disimpan di backend dan tidak ditampilkan di UI
+* **Catatan**: Hasil evaluasi ditampilkan di dashboard admin
 
 ---
 
 ## 👥 Tim Pengembang
 
-* **Oesman** — Lead Developer & Architect
+* **Rifky** — Lead Developer & Systems Architect
+* **Pa Usman** — Admin POV / Client
 * Supporting Developers & UI/UX Designers
 
 ---
