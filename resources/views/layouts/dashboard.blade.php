@@ -37,7 +37,73 @@
         .modal {
             z-index: 1050 !important;
         }
+        /* ===============================
+   NOTIFICATION DROPDOWN FINAL
+=============================== */
+.notif-dropdown {
+    width: 360px;
+    max-width: 90vw;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Item notif */
+.notif-item {
+    white-space: normal;
+    word-break: break-word;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Timestamp */
+.notif-item small {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.sidebar {
+  height: 100vh;
+  overflow-y: auto; /* tetap bisa scroll */
+}
+
+/* sembunyikan scrollbar di browser berbasis WebKit */
+.sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+/* untuk Firefox */
+.sidebar {
+  scrollbar-width: none;
+}
+
+/* Hilangkan scrollbar tapi tetap bisa scroll dengan mouse/trackpad */
+.notif-dropdown {
+  max-height: 300px;       /* batasi tinggi dropdown agar rapi */
+  overflow-y: auto;        /* tetap bisa scroll */
+  scrollbar-width: none;   /* Firefox */
+}
+
+.notif-dropdown::-webkit-scrollbar {
+  display: none;           /* Chrome, Safari, Edge */
+}
+
+
+/* ===============================
+   MOBILE (iPhone XR & sejenis)
+=============================== */
+@media (max-width: 576px) {
+    .notif-dropdown {
+        width: 90vw;
+        max-width: 250px;
+        right: 10px !important;
+        left: auto !important;
+    }
+}
+
     </style>
+
+    @stack('style')
 </head>
 
 <body>

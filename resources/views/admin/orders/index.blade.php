@@ -7,6 +7,7 @@
     <div class="bg-secondary rounded h-100 p-4">
     <h6 class="mb-3">Daftar Pesanan</h6>
 
+    <div class="table-responsive">
     <table class="table table-bordered text-white align-middle">
     <thead>
     <tr>
@@ -81,6 +82,7 @@
     @endforeach
     </tbody>
     </table>
+    </div>
 
     <div class="mt-3">{{ $orders->links('pagination::bootstrap-5') }}</div>
     </div>

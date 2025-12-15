@@ -8,6 +8,7 @@
   <div class="bg-secondary rounded h-100 p-4">
     <h6 class="mb-3">Pesanan Masuk</h6>
 
+    <div class="table-responsive">
     <table class="table table-hover table-bordered text-white align-middle">
       <thead>
         <tr>
@@ -51,6 +52,7 @@
         @endforelse
       </tbody>
     </table>
+    </div>
 
     <div class="mt-3">{{ $orders->links('pagination::bootstrap-5') }}</div>
   </div>

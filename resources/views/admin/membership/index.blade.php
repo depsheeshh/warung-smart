@@ -8,6 +8,7 @@
 
     {{-- Pending list --}}
     <h6 class="mb-2">Pending</h6>
+    <div class="table-responsive">
     <table class="table table-bordered text-white align-middle">
       <thead>
         <tr>
@@ -46,9 +47,11 @@
         @endforelse
       </tbody>
     </table>
+    </div>
 
     {{-- Active list --}}
     <h6 class="mt-4 mb-2">Aktif</h6>
+    <div class="table-responsive">
     <table class="table table-bordered text-white align-middle">
       <thead>
         <tr>
@@ -81,6 +84,7 @@
         @endforelse
       </tbody>
     </table>
+    </div>
   </div>
 </div>
 @endsection

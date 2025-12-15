@@ -34,24 +34,38 @@
             <a href="#" class="nav-link dropdown-toggle" id="notifDropdown" data-bs-toggle="dropdown">
                 <i class="fa fa-bell"></i>
                 @if(Auth::user()->unreadNotifications->count() > 0)
-                    <span class="badge bg-danger">{{ Auth::user()->unreadNotifications->count() }}</span>
+                    <span class="badge bg-danger">
+                        {{ Auth::user()->unreadNotifications->count() }}
+                    </span>
                 @endif
             </a>
-            <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0" aria-labelledby="notifDropdown" style="min-width:300px;">
+
+            <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0 notif-dropdown"
+                aria-labelledby="notifDropdown">
+
                 <h6 class="dropdown-header text-white">Notifikasi</h6>
+
                 @forelse(Auth::user()->unreadNotifications as $notification)
-                    <a href="#" class="dropdown-item">
-                        <i class="fa fa-info-circle me-2"></i> {{ $notification->data['message'] }}
-                        <small class="text-muted d-block">{{ $notification->created_at->diffForHumans() }}</small>
+                    <a href="#" class="dropdown-item notif-item">
+                        <i class="fa fa-info-circle me-2"></i>
+                        {{ $notification->data['message'] }}
+                        <small class="d-block text-muted">
+                            {{ $notification->created_at->diffForHumans() }}
+                        </small>
                     </a>
                 @empty
-                    <span class="dropdown-item text-muted">Tidak ada notifikasi baru</span>
+                    <span class="dropdown-item text-muted">
+                        Tidak ada notifikasi baru
+                    </span>
                 @endforelse
 
                 <div class="dropdown-divider"></div>
-                <form action="{{ route('notifications.read') }}" method="POST" class="text-center">
+
+                <form action="{{ route('notifications.read') }}" method="POST" class="text-center px-3 pb-2">
                     @csrf
-                    <button type="submit" class="btn btn-sm btn-light">Tandai semua dibaca</button>
+                    <button type="submit" class="btn btn-sm btn-light w-100">
+                        Tandai semua dibaca
+                    </button>
                 </form>
             </div>
         </div>

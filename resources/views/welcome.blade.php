@@ -68,27 +68,6 @@ body.dark-mode section {
 }
 
 /* =======================================
-   HERO
-======================================= */
-.hero {
-  padding: 90px 0;
-  text-align: center;
-  background: linear-gradient(135deg, #ffe8e8, #ffdcdc);
-  color: var(--text-light);
-  transition: background .4s ease, color .4s ease;
-}
-
-.dark-mode .hero {
-  background: linear-gradient(135deg, #222, #000) !important;
-  color: var(--text-dark);
-}
-
-.hero-img {
-  max-width: 420px;
-  filter: drop-shadow(0px 8px 25px rgba(0,0,0,0.25));
-}
-
-/* =======================================
    CTA
 ======================================= */
 .cta-box {
@@ -190,6 +169,67 @@ footer {
 .dark-mode footer a {
   color: white !important;
 }
+
+/* =======================================
+   HERO BACKGROUND SLIDER
+======================================= */
+.hero {
+  position: relative;
+  padding: 100px 0;
+  color: #fff;
+  overflow: hidden;
+}
+
+/* Container tetap di atas */
+.hero .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* Layer background slide */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 1.2s ease-in-out;
+  opacity: 0;
+  z-index: 0;
+}
+
+/* Aktif */
+.hero-bg.active {
+  opacity: 1;
+}
+
+/* Overlay agar teks kebaca */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(192, 57, 43, 0.38);
+  z-index: 1;
+}
+
+/* DARK MODE */
+.dark-mode .hero::after {
+  background: rgba(0,0,0,0.75);
+}
+
+/* Button hero */
+.hero .btn {
+  background: #fff;
+  color: var(--primary);
+  font-weight: 700;
+  border-radius: 8px;
+}
+
+.dark-mode .hero .btn {
+  background: #fff;
+  color: var(--primary);
+}
+
+
 </style>
 
 
@@ -237,11 +277,20 @@ footer {
 
 <!-- HERO -->
 <section class="hero text-center">
+
+  <!-- BACKGROUND SLIDER -->
+  <div class="hero-bg active" style="background-image:url('img/hero/hero-1.jpeg')"></div>
+  <div class="hero-bg" style="background-image:url('img/hero/hero-2.jpg')"></div>
+  <div class="hero-bg" style="background-image:url('img/hero/hero-3.jpg')"></div>
+
   <div class="container d-flex flex-column flex-md-row align-items-center justify-content-center">
     <div data-aos="fade-right">
       <h1>Solusi Digital untuk Warung Masa Kini</h1>
-      <p class="mt-3">Kelola stok, transaksi, kasbon, laporan — semua dalam satu aplikasi modern.</p>
-      <a href="{{ route('register') }}" class="btn btn-light text-danger mt-3 px-4 py-2 fw-bold">
+      <p class="mt-3">
+        Kelola stok, transaksi, kasbon, laporan — semua dalam satu aplikasi modern.
+      </p>
+      <a href="{{ route('register') }}"
+         class="btn btn-light text-danger mt-3 px-4 py-2 fw-bold">
         Mulai Sekarang
       </a>
     </div>
@@ -251,6 +300,8 @@ footer {
     </div>
   </div>
 </section>
+
+
 
 <!-- FITUR -->
 <section id="features" class="py-5">
@@ -403,6 +454,18 @@ footer {
     }
   });
 </script>
+<script>
+  const slides = document.querySelectorAll('.hero-bg');
+  let currentSlide = 0;
+  const slideInterval = 4500; // 4.5 detik
+
+  setInterval(() => {
+    slides[currentSlide].classList.remove('active');
+    currentSlide = (currentSlide + 1) % slides.length;
+    slides[currentSlide].classList.add('active');
+  }, slideInterval);
+</script>
+
 
 
 </body>

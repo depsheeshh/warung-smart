@@ -56,4 +56,4 @@ Schedule::call(function () {
         $debt->customer->notify(new DebtOverdueNotification($debt));
     }
 
-})->daily(); // jalan sekali sehari
+})->daily();

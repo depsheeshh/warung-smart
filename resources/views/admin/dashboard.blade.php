@@ -75,6 +75,7 @@
     {{-- Harga Naik Signifikan --}}
     <h6 class="mt-5 mb-3">Harga Naik Signifikan (≥10%)</h6>
     <div class="card bg-dark text-white p-3 mb-4">
+    <div class="table-responsive">
     <table class="table table-sm table-bordered text-white align-middle mb-0">
         <thead>
         <tr><th>Produk</th><th>Supplier</th><th>Tanggal</th><th>Harga Lama</th><th>Harga Baru</th><th>Kenaikan</th></tr>
@@ -94,6 +95,7 @@
         @endforelse
         </tbody>
     </table>
+    </div>
     </div>
 
     {{-- Stok Rendah --}}

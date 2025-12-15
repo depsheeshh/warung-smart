@@ -118,19 +118,33 @@ class DashboardController extends Controller
 
         if ($role === 'supplier') {
             $monthlyOrders = Order::whereHas('product', fn($q) => $q->where('supplier_id', $user->id))
-                ->select(DB::raw('YEAR(created_at) as year'), DB::raw('MONTH(created_at) as month'),
-                         DB::raw('COUNT(*) as total'), DB::raw('SUM(quantity) as qty_total'),
-                         DB::raw('SUM(total_price) as revenue'))
+                ->join('products', 'orders.product_id', '=', 'products.id')
+                ->select(
+                    DB::raw('YEAR(orders.created_at) as year'),
+                    DB::raw('MONTH(orders.created_at) as month'),
+                    DB::raw('COUNT(*) as total'),
+                    DB::raw('SUM(orders.quantity) as qty_total'),
+                    DB::raw('SUM(products.price * orders.quantity) as revenue')
+                )
+                ->where('orders.status', 'accepted') // tambahkan prefix
                 ->groupBy('year','month')
-                ->orderBy('year')->orderBy('month')
+                ->orderBy('year')
+                ->orderBy('month')
                 ->get();
 
             $data = [
-                'activeProducts' => Product::where('supplier_id',$user->id)->where('status','active')->count(),
+                'activeProducts' => Product::where('supplier_id',$user->id)
+                                        ->where('status','active')
+                                        ->count(),
+
                 'acceptedOrders' => Order::whereHas('product', fn($q) => $q->where('supplier_id',$user->id))
-                                         ->where('status','accepted')->count(),
+                                        ->where('orders.status','accepted') // tambahkan prefix
+                                        ->count(),
+
                 'totalRevenue'   => Order::whereHas('product', fn($q) => $q->where('supplier_id',$user->id))
-                                         ->where('status','accepted')->sum('total_price'),
+                                        ->join('products', 'orders.product_id', '=', 'products.id')
+                                        ->where('orders.status','accepted') // tambahkan prefix
+                                        ->sum(DB::raw('products.price * orders.quantity')),
             ];
 
             return view('supplier.dashboard', compact('user','monthlyOrders') + $data);

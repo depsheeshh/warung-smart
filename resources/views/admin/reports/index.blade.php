@@ -101,6 +101,7 @@
 
         {{-- Detail Pengeluaran --}}
         <h6 class="mb-3">Detail Pengeluaran</h6>
+        <div class="table-responsive">
         <table class="table table-bordered text-white align-middle">
         <thead>
             <tr>
@@ -123,6 +124,7 @@
             @endforelse
         </tbody>
         </table>
+        </div>
 
         {{-- Grafik Keuangan --}}
         <h6 class="mb-3">Grafik Keuangan (Pendapatan vs Biaya vs Kasbon)</h6>
@@ -141,6 +143,7 @@
 
         {{-- Pesanan per Supplier/Admin --}}
         <h6 class="mb-3">Pesanan per Supplier/Admin</h6>
+        <div class="table-responsive">
         <table class="table table-bordered text-white align-middle">
             <thead>
                 <tr>
@@ -171,9 +174,11 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
 
         {{-- Produk per Supplier/Admin --}}
         <h6 class="mb-3">Produk per Supplier/Admin</h6>
+        <div class="table-responsive">
         <table class="table table-bordered text-white align-middle">
             <thead>
                 <tr>
@@ -196,9 +201,11 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
 
         {{-- Detail Pesanan --}}
         <h6 class="mb-3">Detail Pesanan</h6>
+        <div class="table-responsive">
         <table class="table table-bordered text-white">
             <thead>
                 <tr>
@@ -227,11 +234,13 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
 
 
         {{-- Tren Bulanan --}}
         <div class="mb-4">
             <h6>Tren Pesanan Bulanan</h6>
+            <div class="table-responsive">
             <table class="table table-bordered text-white align-middle">
                 <thead>
                     <tr>
@@ -254,6 +263,7 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
 
         {{-- Chart Section --}}

@@ -152,9 +152,13 @@
                         <input type="email" name="email" class="form-control bg-dark text-white" placeholder="Email" required>
                         <label>Email</label>
                     </div>
-                    <div class="form-floating mb-3">
-                        <input type="password" name="password" class="form-control bg-dark text-white" placeholder="Password" required>
+                    <div class="form-floating mb-3 position-relative">
+                        <input type="password" name="password" id="addPassword" class="form-control bg-dark text-white" placeholder="Password" required>
                         <label>Password</label>
+                        <span class="position-absolute top-50 end-0 translate-middle-y me-3 text-white"
+                              onclick="togglePassword('addPassword', this)" style="cursor: pointer;">
+                            <i class="fa fa-eye"></i>
+                        </span>
                     </div>
                     <div class="form-floating mb-3">
                         <input type="text" name="phone" class="form-control bg-dark text-white" placeholder="Nomor Telepon">
