@@ -15,12 +15,15 @@ class MembershipController extends Controller
     public function index()
     {
         $subs = MembershipSubscription::where('user_id', Auth::id())
-                                  ->orderByDesc('created_at')
-                                  ->first();
+                                ->orderByDesc('created_at')
+                                ->first();
 
         $membershipDiscounts = MembershipDiscount::all();
 
-        return view('customer.membership.index', compact('subs','membershipDiscounts'));
+        // Ambil admin pertama (atau bisa semua admin)
+        $admin = User::role('admin')->first();
+
+        return view('customer.membership.index', compact('subs','membershipDiscounts','admin'));
     }
 
     public function subscribe(Request $request)

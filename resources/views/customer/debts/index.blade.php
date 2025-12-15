@@ -9,7 +9,6 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Produk</th>
           <th>Nominal</th>
           <th>Status</th>
           <th>Jatuh Tempo</th>
@@ -20,7 +19,6 @@
         @foreach($debts as $index => $debt)
         <tr>
           <td>{{ $debts->firstItem() + $index }}</td>
-          <td>{{ $debt->product->name ?? '-' }}</td>
           <td>Rp {{ number_format($debt->amount,0,',','.') }}</td>
           <td>
             <span class="badge bg-{{ $debt->status == 'paid' ? 'success' : ($debt->status == 'overdue' ? 'danger' : 'warning') }}">

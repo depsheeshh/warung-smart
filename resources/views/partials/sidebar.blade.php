@@ -235,6 +235,16 @@
           <i class="fa fa-star-half-alt me-2"></i>Membership Saya
         </a>
       </li>
+
+      <!-- Kasbon Section -->
+  <li class="nav-item mt-3 text-uppercase text-muted small px-3">
+    <i class="fa fa-money-bill me-2"></i>Kasbon
+  </li>
+  <li class="nav-item">
+    <a href="{{ route('customer.debts.index') }}" class="nav-link {{ request()->routeIs('customer.debts.*') ? 'active' : '' }}">
+      <i class="fa fa-wallet me-2"></i>Kasbon Saya
+    </a>
+  </li>
     @endrole
 
 

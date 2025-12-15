@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\MembershipDiscountController;
 use App\Http\Controllers\Admin\MembershipController as AdminMembership;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Customer\MembershipController as CustomerMembership;
+use App\Http\Controllers\Customer\DebtController as CustomerDebtController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Supplier\OrderController as SupplierOrderController;
 use App\Http\Controllers\Customer\ProductController as CustomerProductController;
@@ -144,11 +145,14 @@ Route::prefix('customer')
         Route::get('products', [CustomerProductController::class, 'index'])
             ->name('products.index');
         Route::get('orders', [CustomerOrderController::class,'index'])->name('orders.index');
+        Route::post('products/whatsapp', [CustomerProductController::class, 'whatsapp'])
+            ->name('products.whatsapp');
         Route::post('products/{product}/order', [CustomerOrderController::class,'store'])->name('orders.store');
         Route::get('/membership', [CustomerMembership::class,'index'])->name('membership.index');
         Route::post('/membership/subscribe', [CustomerMembership::class,'subscribe'])->name('membership.subscribe');
         Route::post('/membership/{subscription}/cancel', [CustomerMembership::class,'cancel'])->name('membership.cancel');
-
+        Route::get('debts', [CustomerDebtController::class, 'index'])
+            ->name('debts.index');
     });
 
 Route::post('/notifications/read', function () {

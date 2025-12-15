@@ -13,6 +13,7 @@ class Order extends Model
         'status',
         'unit_price',
         'total_price',
+        'rejection_reason'
     ];
 
     protected $casts = [

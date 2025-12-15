@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->integer('quantity');
             $table->enum('status',['pending','accepted','rejected'])->default('pending');
+            $table->text('rejection_reason')->nullable();
             $table->decimal('price_snapshot', 12, 2)->default(0); // harga final saat order dibuat
             $table->timestamps();
 

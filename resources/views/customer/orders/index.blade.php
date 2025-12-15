@@ -27,6 +27,7 @@
           <th>Harga Satuan</th>
           <th>Total Harga</th>
           <th>Status</th>
+          <th>Alasan Penolakan</th>
           <th>Tanggal</th>
         </tr>
       </thead>
@@ -67,7 +68,13 @@
               <span class="badge bg-warning text-dark">Pending</span>
             @endif
           </td>
-
+          <td>
+            @if($order->status === 'rejected')
+                <small class="text-muted">Alasan: {{ $order->rejection_reason }}</small>
+            @else
+                <span class="text-muted">—</span>
+            @endif
+            </td>
           <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
         </tr>
         @endforeach
